@@ -1,0 +1,26 @@
+# Copy this file to terraform.tfvars and fill in your values:
+#   cp terraform.tfvars.example terraform.tfvars
+#
+# terraform.tfvars is gitignored so your IDs stay out of GitHub.
+
+# REQUIRED: Object IDs of your break-glass / emergency access accounts.
+# These get excluded from every policy so you can never lock yourself out.
+# Find them in Entra ID > Users > click the account > Object ID.
+break_glass_user_ids = ["00000000-0000-0000-0000-000000000000"]
+
+# Object ID of a group containing your admin users.
+# Used by the "Require MFA for Admins" policy.
+# Find it in Entra ID > Groups > click the group > Object ID.
+admin_group_id = "00000000-0000-0000-0000-000000000000"
+
+# Two-letter country codes to block sign-ins from.
+# Default: North Korea, Iran, Russia, China.
+blocked_countries = ["KP", "IR", "RU", "CN"]
+
+# Hours before a user must re-authenticate.
+# Default: 12 hours.
+session_max_hours = 12
+
+# Deploy in report-only mode first to test safely.
+# Change to "enabled" once you've verified in sign-in logs.
+policy_state = "enabledForReportingButNotEnforced"
