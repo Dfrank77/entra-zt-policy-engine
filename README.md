@@ -27,3 +27,137 @@ The **deploy engine** (Terraform) provides a complete set of Zero Trust CA polic
 
 ## Sample Output
 
+```
+Authenticating to Microsoft Graph...
+Retrieving Conditional Access policies...
+  Found 12 policies.
+Retrieving named locations...
+  Found 1 named locations.
+
+Running Zero Trust baseline checks...
+
+  [PASS] ZT-001: Block legacy authentication
+  [FAIL] ZT-002: Require MFA for admin roles
+  [PASS] ZT-003: Require MFA for all users
+  [PASS] ZT-004: Sign-in risk policy configured
+  [PASS] ZT-005: User risk policy configured
+  [WARN] ZT-006: Location-based access controls
+  [PASS] ZT-007: Break-glass account exclusions
+  [FAIL] ZT-008: Session controls configured
+  [WARN] ZT-009: Report-only policies
+  [WARN] ZT-010: Disabled policies
+
+  Results: 5 passed, 2 failed, 3 warnings
+
+  Report saved to: sample-output/gap_report.md
+```
+
+A full sample report is available at [sample-output/gap_report.md](sample-output/gap_report.md).
+
+## Project Structure
+
+```
+entra-zt-policy-engine/
+├── audit/
+│   ├── audit.py              # main entry point
+│   ├── graph_client.py       # Graph API auth + data pull
+│   ├── baseline.py           # zero trust baseline checks
+│   ├── report.py             # markdown report generator
+│   └── requirements.txt      # Python dependencies
+├── deploy/
+│   ├── providers.tf          # AzureAD provider config
+│   ├── variables.tf          # input variables
+│   ├── main.tf               # all CA policy resources
+│   ├── outputs.tf            # deployment outputs
+│   └── terraform.tfvars.example  # template for user config
+├── sample-output/
+│   └── gap_report.md         # example audit report
+└── README.md
+```
+
+## Prerequisites
+
+- Python 3.9+
+- Terraform 1.5+
+- Azure CLI (`az login`)
+- An Entra ID tenant with P1 or P2 licensing (required for Conditional Access)
+- Account with Security Reader role (audit) or Conditional Access Administrator role (deploy)
+
+## Usage
+
+### Audit
+
+Run the audit to see your tenant's current Zero Trust posture:
+
+```bash
+# Clone the repo
+git clone https://github.com/Dfrank77/entra-zt-policy-engine.git
+cd entra-zt-policy-engine
+
+# Set up Python environment
+python3 -m venv venv
+source venv/bin/activate
+pip install -r audit/requirements.txt
+
+# Authenticate to your tenant
+az login
+
+# Run the audit
+cd audit
+python audit.py
+```
+
+The audit generates a gap report at `sample-output/gap_report.md`.
+
+### Deploy
+
+Close the gaps identified by the audit:
+
+```bash
+cd deploy
+
+# Configure your environment
+cp terraform.tfvars.example terraform.tfvars
+# Edit terraform.tfvars with your break-glass IDs, admin group ID, etc.
+
+# Deploy
+terraform init
+terraform plan
+terraform apply
+```
+
+Policies deploy in **report-only mode** by default. Monitor sign-in logs to verify behavior, then change `policy_state` to `"enabled"` in `terraform.tfvars` and run `terraform apply` again.
+
+### Re-audit
+
+After deploying, run the audit again to confirm the gaps are closed:
+
+```bash
+cd ../audit
+python audit.py
+```
+
+## Deployed Policies
+
+| ID | Policy | What It Does |
+|----|--------|-------------|
+| ZT-001 | Block Legacy Authentication | Blocks Exchange ActiveSync and other legacy auth clients that cannot perform MFA |
+| ZT-002 | Require MFA for Admins | Requires MFA for the specified admin group |
+| ZT-003 | Require MFA for All Users | Baseline MFA requirement for every user in the tenant |
+| ZT-004 | Require MFA for Risky Sign-ins | Triggers MFA on medium and high risk sign-ins detected by Identity Protection |
+| ZT-005 | Require Password Change for User Risk | Forces password change and MFA when a user account is flagged as high risk |
+| ZT-006 | Block High-Risk Country Sign-ins | Blocks sign-ins from specified countries and unknown locations |
+| ZT-008 | Enforce Session Sign-in Frequency | Forces re-authentication after a configurable number of hours and disables persistent browser sessions |
+
+All policies exclude break-glass accounts to prevent tenant lockout.
+
+## References
+
+- [CIS Microsoft 365 Foundations Benchmark](https://www.cisecurity.org/benchmark/microsoft_365)
+- [Microsoft Zero Trust Conditional Access guidance](https://learn.microsoft.com/en-us/entra/identity/conditional-access/plan-conditional-access)
+- [Microsoft Emergency Access Accounts](https://learn.microsoft.com/en-us/entra/identity/role-based-access-control/security-emergency-access)
+- [AzureAD Terraform Provider](https://registry.terraform.io/providers/hashicorp/azuread/latest/docs)
+
+## License
+
+MIT
