@@ -135,7 +135,7 @@ resource "azuread_conditional_access_policy" "require_password_change_user_risk"
   state        = var.policy_state
 
   conditions {
-    client_app_types = ["browser", "mobileAppsAndDesktopClients"]
+    client_app_types = ["all"]
     user_risk_levels = ["high"]
 
     applications {
@@ -158,6 +158,7 @@ resource "azuread_conditional_access_policy" "require_password_change_user_risk"
 # Blocks sign-ins from specified countries plus unknown locations.
 # CIS M365 6.2.6
 
+/*
 resource "azuread_named_location" "blocked_countries" {
   display_name = "ZT - Blocked Countries"
 
@@ -192,7 +193,10 @@ resource "azuread_conditional_access_policy" "block_unknown_locations" {
     operator          = "OR"
     built_in_controls = ["block"]
   }
+
+  depends_on = [azuread_named_location.blocked_countries]
 }
+*/
 
 # --- ZT-008: Enforce Session Sign-in Frequency ---
 # Forces re-authentication after a set number of hours and
@@ -222,13 +226,9 @@ resource "azuread_conditional_access_policy" "session_frequency" {
   }
 
   session_controls {
-    sign_in_frequency {
-      value  = var.session_max_hours
-      period = "hours"
-    }
-
-    persistent_browser {
-      mode = "never"
-    }
+    sign_in_frequency                 = var.session_max_hours
+    sign_in_frequency_period          = "hours"
+    persistent_browser_mode           = "never"
   }
 }
+

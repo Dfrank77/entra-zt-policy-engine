@@ -37,6 +37,13 @@ def _policy_targets_admin_roles(policy):
     return len(roles) > 0
 
 
+def _policy_targets_admin_groups(policy):
+    """Check if a policy includes specific groups (admin groups)."""
+    users = policy.get("conditions", {}).get("users", {})
+    groups = users.get("includeGroups", [])
+    return len(groups) > 0
+
+
 def _policy_requires_mfa(policy):
     """Check if a policy requires MFA in grant controls."""
     grant = policy.get("grantControls", {})
@@ -110,14 +117,14 @@ def check_legacy_auth_blocked(policies):
                 "name": "Block legacy authentication",
                 "status": "PASS",
                 "detail": f"Policy '{p.get('displayName')}' blocks legacy auth clients.",
-                "reference": "CIS M365 6.2.1 / MS Zero Trust CA guidance",
+                "reference": "CIS M365 5.2.2.3 / MS Zero Trust CA guidance",
             }
     return {
         "id": "ZT-001",
         "name": "Block legacy authentication",
         "status": "FAIL",
         "detail": "No active policy blocks legacy authentication (clientAppTypes: 'other').",
-        "reference": "CIS M365 6.2.1 / MS Zero Trust CA guidance",
+        "reference": "CIS M365 5.2.2.3 / MS Zero Trust CA guidance",
     }
 
 
@@ -125,20 +132,20 @@ def check_mfa_admins(policies):
     """ZT-002: MFA required for all admin roles."""
     active = _policies_by_state(policies, "active")
     for p in active:
-        if _policy_targets_admin_roles(p) and _policy_requires_mfa(p):
+        if (_policy_targets_admin_roles(p) or _policy_targets_admin_groups(p)) and _policy_requires_mfa(p):
             return {
                 "id": "ZT-002",
                 "name": "Require MFA for admin roles",
                 "status": "PASS",
-                "detail": f"Policy '{p.get('displayName')}' requires MFA for admin roles.",
-                "reference": "CIS M365 6.2.2 / MS Zero Trust CA guidance",
+                "detail": f"Policy '{p.get('displayName')}' requires MFA for admin roles or admin groups.",
+                "reference": "CIS M365 5.2.2.1 / MS Zero Trust CA guidance",
             }
     return {
         "id": "ZT-002",
         "name": "Require MFA for admin roles",
         "status": "FAIL",
-        "detail": "No active policy requires MFA for directory roles.",
-        "reference": "CIS M365 6.2.2 / MS Zero Trust CA guidance",
+        "detail": "No active policy requires MFA for directory roles or admin groups.",
+        "reference": "CIS M365 5.2.2.1 / MS Zero Trust CA guidance",
     }
 
 
@@ -152,14 +159,14 @@ def check_mfa_all_users(policies):
                 "name": "Require MFA for all users",
                 "status": "PASS",
                 "detail": f"Policy '{p.get('displayName')}' requires MFA for all users.",
-                "reference": "CIS M365 6.2.3 / MS Zero Trust CA guidance",
+                "reference": "CIS M365 5.2.2.2 / MS Zero Trust CA guidance",
             }
     return {
         "id": "ZT-003",
         "name": "Require MFA for all users",
         "status": "FAIL",
         "detail": "No active policy requires MFA for all users.",
-        "reference": "CIS M365 6.2.3 / MS Zero Trust CA guidance",
+        "reference": "CIS M365 5.2.2.2 / MS Zero Trust CA guidance",
     }
 
 
@@ -173,14 +180,14 @@ def check_signin_risk_policy(policies):
                 "name": "Sign-in risk policy configured",
                 "status": "PASS",
                 "detail": f"Policy '{p.get('displayName')}' enforces MFA on risky sign-ins.",
-                "reference": "CIS M365 6.2.4 / MS Identity Protection guidance",
+                "reference": "CIS M365 5.2.2.6 / MS Identity Protection guidance",
             }
     return {
         "id": "ZT-004",
         "name": "Sign-in risk policy configured",
         "status": "FAIL",
         "detail": "No active policy requires MFA based on sign-in risk level.",
-        "reference": "CIS M365 6.2.4 / MS Identity Protection guidance",
+        "reference": "CIS M365 5.2.2.6 / MS Identity Protection guidance",
     }
 
 
@@ -199,14 +206,14 @@ def check_user_risk_policy(policies):
                     "name": "User risk policy configured",
                     "status": "PASS",
                     "detail": f"Policy '{p.get('displayName')}' responds to user risk.",
-                    "reference": "CIS M365 6.2.5 / MS Identity Protection guidance",
+                    "reference": "CIS M365 5.2.2.7 / MS Identity Protection guidance",
                 }
     return {
         "id": "ZT-005",
         "name": "User risk policy configured",
         "status": "FAIL",
         "detail": "No active policy requires password change or MFA based on user risk level.",
-        "reference": "CIS M365 6.2.5 / MS Identity Protection guidance",
+        "reference": "CIS M365 5.2.2.7 / MS Identity Protection guidance",
     }
 
 
@@ -218,7 +225,7 @@ def check_location_based_policy(policies, named_locations):
             "name": "Location-based access controls",
             "status": "FAIL",
             "detail": "No named locations defined. Cannot enforce location-based policies.",
-            "reference": "CIS M365 6.2.6 / MS Zero Trust CA guidance",
+            "reference": "CIS M365 5.2.2.8 / MS Zero Trust CA guidance",
         }
     active = _policies_by_state(policies, "active")
     for p in active:
@@ -230,14 +237,14 @@ def check_location_based_policy(policies, named_locations):
                 "name": "Location-based access controls",
                 "status": "PASS",
                 "detail": f"Policy '{p.get('displayName')}' uses location conditions. {len(named_locations)} named location(s) defined.",
-                "reference": "CIS M365 6.2.6 / MS Zero Trust CA guidance",
+                "reference": "CIS M365 5.2.2.8 / MS Zero Trust CA guidance",
             }
     return {
         "id": "ZT-006",
         "name": "Location-based access controls",
         "status": "WARNING",
         "detail": f"{len(named_locations)} named location(s) defined but no active policy uses location conditions.",
-        "reference": "CIS M365 6.2.6 / MS Zero Trust CA guidance",
+        "reference": "CIS M365 5.2.2.8 / MS Zero Trust CA guidance",
     }
 
 
@@ -275,14 +282,14 @@ def check_session_controls(policies):
                 "name": "Session controls configured",
                 "status": "PASS",
                 "detail": f"Policy '{p.get('displayName')}' has session controls (sign-in frequency or persistent browser).",
-                "reference": "CIS M365 6.2.7 / MS Zero Trust CA guidance",
+                "reference": "CIS M365 5.2.2.4 / MS Zero Trust CA guidance",
             }
     return {
         "id": "ZT-008",
         "name": "Session controls configured",
         "status": "FAIL",
         "detail": "No active policy configures session sign-in frequency or persistent browser settings.",
-        "reference": "CIS M365 6.2.7 / MS Zero Trust CA guidance",
+        "reference": "CIS M365 5.2.2.4 / MS Zero Trust CA guidance",
     }
 
 
