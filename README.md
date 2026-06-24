@@ -55,7 +55,7 @@ Running Zero Trust baseline checks...
 ### Before vs After Deployment
 
 | Check |                                  | Before | After |
-|-------|--------|-------|
+|-------|                                  |--------|-------|
 | ZT-001: Block legacy authentication     | ✅ Pass | ✅ Pass |
 | ZT-002: Require MFA for admin roles     | ❌ Fail | ✅ Pass |
 | ZT-003: Require MFA for all users       | ✅ Pass | ✅ Pass |
