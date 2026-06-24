@@ -29,33 +29,37 @@ The **deploy engine** (Terraform) provides a complete set of Zero Trust CA polic
 
 ### Before: Initial Audit
 
-> ✅ ZT-001: Block legacy authentication
-> ❌ ZT-002: Require MFA for admin roles
-> ✅ ZT-003: Require MFA for all users
-> ✅ ZT-004: Sign-in risk policy configured
-> ✅ ZT-005: User risk policy configured
-> ⚠️ ZT-006: Location-based access controls
-> ✅ ZT-007: Break-glass account exclusions
-> ❌ ZT-008: Session controls configured
-> ⚠️ ZT-009: Report-only policies
-> ⚠️ ZT-010: Disabled policies
->
-> **Results: 5 passed, 2 failed, 3 warnings**
+| Status | Check |
+|--------|-------|
+| ✅ Pass | ZT-001: Block legacy authentication |
+| ❌ Fail | ZT-002: Require MFA for admin roles |
+| ✅ Pass | ZT-003: Require MFA for all users |
+| ✅ Pass | ZT-004: Sign-in risk policy configured |
+| ✅ Pass | ZT-005: User risk policy configured |
+| ⚠️ Warn | ZT-006: Location-based access controls |
+| ✅ Pass | ZT-007: Break-glass account exclusions |
+| ❌ Fail | ZT-008: Session controls configured |
+| ⚠️ Warn | ZT-009: Report-only policies |
+| ⚠️ Warn | ZT-010: Disabled policies |
+
+**Results: 5 passed, 2 failed, 3 warnings**
 
 ### After: Post-Deployment Audit
 
-> ✅ ZT-001: Block legacy authentication
-> ✅ ZT-002: Require MFA for admin roles
-> ✅ ZT-003: Require MFA for all users
-> ✅ ZT-004: Sign-in risk policy configured
-> ✅ ZT-005: User risk policy configured
-> ✅ ZT-006: Location-based access controls
-> ✅ ZT-007: Break-glass account exclusions
-> ✅ ZT-008: Session controls configured
-> ⚠️ ZT-009: Report-only policies
-> ✅ ZT-010: Disabled policies
->
-> **Results: 9 passed, 0 failed, 1 warning**
+| Status | Check |
+|--------|-------|
+| ✅ Pass | ZT-001: Block legacy authentication |
+| ✅ Pass | ZT-002: Require MFA for admin roles |
+| ✅ Pass | ZT-003: Require MFA for all users |
+| ✅ Pass | ZT-004: Sign-in risk policy configured |
+| ✅ Pass | ZT-005: User risk policy configured |
+| ✅ Pass | ZT-006: Location-based access controls |
+| ✅ Pass | ZT-007: Break-glass account exclusions |
+| ✅ Pass | ZT-008: Session controls configured |
+| ⚠️ Warn | ZT-009: Report-only policies |
+| ✅ Pass | ZT-010: Disabled policies |
+
+**Results: 9 passed, 0 failed, 1 warning**
 
 Full reports available at [sample-output/before_report.md](sample-output/before_report.md) and [sample-output/after_report.md](sample-output/after_report.md).
 
