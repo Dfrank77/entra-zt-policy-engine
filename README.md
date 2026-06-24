@@ -27,39 +27,46 @@ The **deploy engine** (Terraform) provides a complete set of Zero Trust CA polic
 
 ## Sample Output
 
-### Before: Initial Audit
+```
+Authenticating to Microsoft Graph...
+Retrieving Conditional Access policies...
+  Found 12 policies.
+Retrieving named locations...
+  Found 1 named locations.
 
-| Status | Check |
-|--------|-------|
-| ✅ Pass | ZT-001: Block legacy authentication |
-| ❌ Fail | ZT-002: Require MFA for admin roles |
-| ✅ Pass | ZT-003: Require MFA for all users |
-| ✅ Pass | ZT-004: Sign-in risk policy configured |
-| ✅ Pass | ZT-005: User risk policy configured |
-| ⚠️ Warn | ZT-006: Location-based access controls |
-| ✅ Pass | ZT-007: Break-glass account exclusions |
-| ❌ Fail | ZT-008: Session controls configured |
-| ⚠️ Warn | ZT-009: Report-only policies |
-| ⚠️ Warn | ZT-010: Disabled policies |
+Running Zero Trust baseline checks...
 
-**Results: 5 passed, 2 failed, 3 warnings**
+  [PASS] ZT-001: Block legacy authentication
+  [FAIL] ZT-002: Require MFA for admin roles
+  [PASS] ZT-003: Require MFA for all users
+  [PASS] ZT-004: Sign-in risk policy configured
+  [PASS] ZT-005: User risk policy configured
+  [WARN] ZT-006: Location-based access controls
+  [PASS] ZT-007: Break-glass account exclusions
+  [FAIL] ZT-008: Session controls configured
+  [WARN] ZT-009: Report-only policies
+  [WARN] ZT-010: Disabled policies
 
-### After: Post-Deployment Audit
+  Results: 5 passed, 2 failed, 3 warnings
 
-| Status | Check |
-|--------|-------|
-| ✅ Pass | ZT-001: Block legacy authentication |
-| ✅ Pass | ZT-002: Require MFA for admin roles |
-| ✅ Pass | ZT-003: Require MFA for all users |
-| ✅ Pass | ZT-004: Sign-in risk policy configured |
-| ✅ Pass | ZT-005: User risk policy configured |
-| ✅ Pass | ZT-006: Location-based access controls |
-| ✅ Pass | ZT-007: Break-glass account exclusions |
-| ✅ Pass | ZT-008: Session controls configured |
-| ⚠️ Warn | ZT-009: Report-only policies |
-| ✅ Pass | ZT-010: Disabled policies |
+  Report saved to: sample-output/gap_report.md
+```
 
-**Results: 9 passed, 0 failed, 1 warning**
+### Before vs After Deployment
+
+| Check |                                  | Before | After |
+|-------|--------|-------|
+| ZT-001: Block legacy authentication     | ✅ Pass | ✅ Pass |
+| ZT-002: Require MFA for admin roles     | ❌ Fail | ✅ Pass |
+| ZT-003: Require MFA for all users       | ✅ Pass | ✅ Pass |
+| ZT-004: Sign-in risk policy configured  | ✅ Pass | ✅ Pass |
+| ZT-005: User risk policy configured     | ✅ Pass | ✅ Pass |
+| ZT-006: Location-based access controls  | ⚠️ Warn | ✅ Pass |
+| ZT-007: Break-glass account exclusions  | ✅ Pass | ✅ Pass |
+| ZT-008: Session controls configured     | ❌ Fail | ✅ Pass |
+| ZT-009: Report-only policies            | ⚠️ Warn | ⚠️ Warn |
+| ZT-010: Disabled policies               | ⚠️ Warn | ✅ Pass |
+| **Total** | **5 passed, 2 failed, 3 warnings** | **9 passed, 0 failed, 1 warning** |
 
 Full reports available at [sample-output/before_report.md](sample-output/before_report.md) and [sample-output/after_report.md](sample-output/after_report.md).
 
