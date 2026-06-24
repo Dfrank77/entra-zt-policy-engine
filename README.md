@@ -27,6 +27,8 @@ The **deploy engine** (Terraform) provides a complete set of Zero Trust CA polic
 
 ## Sample Output
 
+### Before: Initial Audit
+
 ```
 Authenticating to Microsoft Graph...
 Retrieving Conditional Access policies...
@@ -48,11 +50,34 @@ Running Zero Trust baseline checks...
   [WARN] ZT-010: Disabled policies
 
   Results: 5 passed, 2 failed, 3 warnings
-
-  Report saved to: sample-output/gap_report.md
 ```
 
-A full sample report is available at [sample-output/gap_report.md](sample-output/gap_report.md).
+### After: Post-Deployment Audit
+
+```
+Authenticating to Microsoft Graph...
+Retrieving Conditional Access policies...
+  Found 9 policies.
+Retrieving named locations...
+  Found 1 named locations.
+
+Running Zero Trust baseline checks...
+
+  [PASS] ZT-001: Block legacy authentication
+  [PASS] ZT-002: Require MFA for admin roles
+  [PASS] ZT-003: Require MFA for all users
+  [PASS] ZT-004: Sign-in risk policy configured
+  [PASS] ZT-005: User risk policy configured
+  [PASS] ZT-006: Location-based access controls
+  [PASS] ZT-007: Break-glass account exclusions
+  [PASS] ZT-008: Session controls configured
+  [WARN] ZT-009: Report-only policies
+  [PASS] ZT-010: Disabled policies
+
+  Results: 9 passed, 0 failed, 1 warning
+```
+
+Full reports available at [sample-output/before_report.md](sample-output/before_report.md) and [sample-output/after_report.md](sample-output/after_report.md).
 
 ## Project Structure
 
@@ -71,7 +96,9 @@ entra-zt-policy-engine/
 │   ├── outputs.tf            # deployment outputs
 │   └── terraform.tfvars.example  # template for user config
 ├── sample-output/
-│   └── gap_report.md         # example audit report
+│   ├── before_report.md      # audit before deployment
+│   ├── after_report.md       # audit after deployment
+│   └── gap_report.md         # latest audit report
 └── README.md
 ```
 
